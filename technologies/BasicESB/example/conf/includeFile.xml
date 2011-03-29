@@ -1,0 +1,33 @@
+<BasicESB>
+
+	<controller uri="/included" name="includedController" timeout="100">
+
+		<pipes name="batch1">
+			<pipeline name="testPipeline1" />
+			<pipeline name="testPipeline2" />
+			<pipeline name="testPipeline3" />
+		</pipes>
+
+		<pipes name="batch2">
+			<pipeline name="testPipeline4" />
+			<pipeline name="testPipeline5" />
+			<pipeline name="testPipeline6" />
+		</pipes>
+
+		<limitor>
+			<pipeline />
+			<pipeline />
+			<pipeline />
+		</limitor>
+
+	</controller>
+	<pipeline name="testPipeline3" timeout="200">
+		<evaluator name="mockEval" class="com.pjaol.ESB.Mock.MockEvaluator">
+			<arg name="arg1">lalala</arg>
+		</evaluator>
+		<module name="mockModule3" class="com.pjaol.ESB.Mock.MockModule" />
+		<module name="mockModule4" class="com.pjaol.ESB.Mock.MockModule" />
+		<module name="mockModule5" class="com.pjaol.ESB.Mock.MockModule" />
+	</pipeline>
+
+</BasicESB>

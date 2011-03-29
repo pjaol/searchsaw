@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     Mar 5, 2011 2:07:36 PM                                                        
+
+     BasicESB    
+     Core ESB for running high performance modules
+                   
+     pjaol                                                                
+     ====================================================================== -->
+<project name="BasicESB" default="default" xmlns:ivy="antlib:org.apache.ivy.ant">
+	<description>
+            Core ESB for running high performance modules
+    </description>
+
+	<property name="ivy.lib.dir" value="lib" />
+	<property name="build.dir" value="build" />
+	<property name="dist.dir" value="dist" />
+	<property name="src.dir" value="src" />
+
+	<path id="classpath">
+		<fileset dir="${ivy.lib.dir}">
+			<include name="*.jar" />
+			<exclude name="servlet-api*" />
+		</fileset>
+
+	</path>
+	<!-- ================================= 
+          target: default              
+         ================================= -->
+	<target name="default" depends="depends" description="Core ESB for running high performance modules">
+
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: depends                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="depends" depends="clean, setup, resolve, compile">
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: setup                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="setup">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${dist.dir}" />
+		<mkdir dir="${ivy.lib.dir}"/>
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: clean                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+	</target>
+
+	<!-- ================================= 
+          target: compile              
+         ================================= -->
+	<target name="compile" description="compile java files">
+		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="classpath" debug="on" />
+		<jar destfile="${dist.dir}/${ant.project.name}.jar" />
+	</target>
+
+
+	<!-- =================================
+	                  target: resolve
+	                 ================================= -->
+	<target name="resolve" description="--> retrieve dependencies with ivy">
+		<ivy:retrieve />
+	</target>
+
+	
+</project>
