@@ -6,6 +6,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.solr.common.util.NamedList;
 
 import com.pjaol.ESB.Exceptions.ModuleRunException;
@@ -22,7 +24,9 @@ public class Controller extends Module{
 	private int timeout;
 	private ESBCore core = ESBCore.getInstance();
 	private ExecutorService executorService ;
+	private Logger _logger = Logger.getLogger(getClass());
 	
+	@SuppressWarnings("rawtypes")
 	@Override
 	public NamedList process(NamedList input) throws ModuleRunException {
 		CountDownLatch start = new CountDownLatch(1);
@@ -58,7 +62,11 @@ public class Controller extends Module{
 				executorService.execute(new ModuleRunner(start, stop, module, input));
 			}
 		}
-		System.out.println("******* Starting *******");
+		
+		if(_logger.getLevel() == Level.DEBUG)
+			_logger.debug("******* Starting *******");
+		
+		
 		long startT = System.currentTimeMillis();
 		start.countDown();
 		timer.start();
@@ -76,15 +84,15 @@ public class Controller extends Module{
 		
 		long endT = System.currentTimeMillis();
 		
-		System.out.println("******* Shutting down ******* taken: "+ (endT - startT) +" ms" );
+		if(_logger.getLevel() == Level.DEBUG)
+			_logger.debug("******* Shutting down ******* taken: "+ (endT - startT) +" ms" );
 		
-		
-		return null;
+		return input;
 	}
 
 	
 	@Override
-	public void init(Map args) {}
+	public void init(Map<String, String> args) {}
 	
 
 	public void setPipelines(Map<String, List<String>> pipelines) {

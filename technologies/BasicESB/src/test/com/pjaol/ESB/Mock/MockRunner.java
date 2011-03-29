@@ -22,7 +22,7 @@ public class MockRunner {
 	private ESBCore core = ESBCore.getInstance();
 	
 	public static void main(String[] args) {
-		String fileName = "example/conf/example.xml";
+		String fileName = "technologies/BasicESB/example/conf/example.xml";
 		XMLConfiguration config = new XMLConfiguration();
 		Initializer initializer = new Initializer();
 

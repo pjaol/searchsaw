@@ -145,6 +145,7 @@ public class Initializer {
 		return m;
 	}
 
+	@SuppressWarnings("unchecked")
 	private <T> T extracted(String className) throws InstantiationException,
 			IllegalAccessException, ClassNotFoundException {
 		return (T) Class.forName(className).newInstance();

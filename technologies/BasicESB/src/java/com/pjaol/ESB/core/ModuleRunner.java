@@ -11,9 +11,10 @@ public class ModuleRunner implements Runnable{
 	private CountDownLatch start;
 	private CountDownLatch stop;
 	private Module module;
+	@SuppressWarnings("rawtypes")
 	private NamedList input;
 	
-	public ModuleRunner(CountDownLatch start, CountDownLatch stop, Module module, NamedList input) {
+	public ModuleRunner(CountDownLatch start, CountDownLatch stop, Module module, @SuppressWarnings("rawtypes") NamedList input) {
 		this.start = start;
 		this.stop = stop;
 		this.module = module;

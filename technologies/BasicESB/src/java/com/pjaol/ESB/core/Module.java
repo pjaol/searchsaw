@@ -19,7 +19,8 @@ public abstract class Module {
 	}
 	
 	
+	@SuppressWarnings("rawtypes")
 	public abstract NamedList process(NamedList input) throws ModuleRunException;
-	public abstract void init(Map args);
+	public abstract void init(Map<String, String> args);
 	
 }

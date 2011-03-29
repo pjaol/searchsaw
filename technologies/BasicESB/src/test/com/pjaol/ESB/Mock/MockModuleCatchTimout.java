@@ -9,7 +9,6 @@ import com.pjaol.ESB.core.Module;
 
 public class MockModuleCatchTimout extends Module {
 	
-	Random rand = new Random();
 
 	@Override
 	public NamedList process(NamedList input) {

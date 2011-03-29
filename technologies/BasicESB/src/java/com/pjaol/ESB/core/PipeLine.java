@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.management.monitor.CounterMonitor;
-
 import org.apache.solr.common.util.NamedList;
 
 import com.pjaol.ESB.Exceptions.ModuleRunException;
@@ -36,6 +34,7 @@ public class PipeLine extends Module{
 	}
 
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public NamedList process(NamedList input) throws ModuleRunException {
 		
@@ -52,7 +51,7 @@ public class PipeLine extends Module{
 
 
 	@Override
-	public void init(Map args) {
+	public void init(Map<String, String> args) {
 		
 		
 	}

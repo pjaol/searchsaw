@@ -28,13 +28,13 @@ public class Evaluator {
 	 * @param input
 	 * @return
 	 */
-	public boolean evaluate(NamedList input){
+	public boolean evaluate(@SuppressWarnings("rawtypes") NamedList input){
 		return true;
 	}
 
 	
 	
-	public void init(Map args) {
+	public void init(Map<String, String> args) {
 		
 	}
 	
