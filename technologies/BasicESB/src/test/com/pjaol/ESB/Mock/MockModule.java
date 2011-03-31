@@ -12,23 +12,29 @@ public class MockModule extends Module {
 	Random rand = new Random();
 
 	@Override
-	public NamedList process(NamedList input) {
+	public NamedList process(NamedList input) throws Exception {
 		NamedList result = new NamedList();
 		int rst = rand.nextInt(100);
 		
 		result.add("randomTime", rst);
 		System.out.println(getName()+" running with input: "+ input+" sleeping for "+ rst +"ms");
-		try {
-			Thread.sleep(rst);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		
+		Thread.sleep(rst);
+		
 		
 		return result;
 	}
 
+	
+
 	@Override
-	public void init(Map args) {
+	public void initializeMonitor() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void init(Map<String, String> args) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -74,8 +74,11 @@ public class Initializer {
 				Module m = initializeModule(mod);
 				pipeModules.add(m);
 			}
+			
 			pipeline.setModules(pipeModules);
-
+			pipeline.init(c.getArgs());
+			pipeline.initializeMonitor();
+			
 			result.put(c.getName(), pipeline);
 		}
 
@@ -115,6 +118,8 @@ public class Initializer {
 		controller.setTimeout(controllerComponent.getTimeout());
 
 		controller.init(controllerComponent.getArgs());
+		controller.initializeMonitor();
+		
 		return controller;
 
 	}
@@ -128,7 +133,7 @@ public class Initializer {
 		Evaluator e = extracted(className);
 		e.setName(evaluatorComponent.getName());
 		e.init(evaluatorComponent.getArgs());
-
+		
 		return e;
 	}
 
@@ -141,7 +146,8 @@ public class Initializer {
 		Module m = extracted(className);
 		m.setName(module.getName());
 		m.init(module.getArgs());
-
+		m.initializeMonitor();
+		
 		return m;
 	}
 

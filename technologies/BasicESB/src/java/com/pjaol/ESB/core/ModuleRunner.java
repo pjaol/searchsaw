@@ -5,6 +5,7 @@ import java.util.concurrent.CountDownLatch;
 import org.apache.solr.common.util.NamedList;
 
 import com.pjaol.ESB.Exceptions.ModuleRunException;
+import com.pjaol.ESB.monitor.MonitorBean;
 
 public class ModuleRunner implements Runnable{
 	
@@ -13,12 +14,15 @@ public class ModuleRunner implements Runnable{
 	private Module module;
 	@SuppressWarnings("rawtypes")
 	private NamedList input;
+	private MonitorBean errorBean, timeoutCountBean;
 	
-	public ModuleRunner(CountDownLatch start, CountDownLatch stop, Module module, @SuppressWarnings("rawtypes") NamedList input) {
+	public ModuleRunner(CountDownLatch start, CountDownLatch stop, Module module, @SuppressWarnings("rawtypes") NamedList input, MonitorBean errorBean, MonitorBean timeoutCountBean) {
 		this.start = start;
 		this.stop = stop;
 		this.module = module;
 		this.input = input;
+		this.errorBean = errorBean;
+		this.timeoutCountBean = timeoutCountBean;
 		
 	}
 
@@ -31,11 +35,14 @@ public class ModuleRunner implements Runnable{
 				module.process(input);
 			}
 		} catch (InterruptedException e) {
+			timeoutCountBean.inc(1);
 			throw new RuntimeException(e);
-		} catch (ModuleRunException e) {
-			throw new RuntimeException(e);
+		} catch (Exception e) {
+			errorBean.inc(1); // a timeout might not be an error?
+			e.printStackTrace();
+		} finally {
+			stop.countDown();
 		}
-		stop.countDown();
 	}
 
 }

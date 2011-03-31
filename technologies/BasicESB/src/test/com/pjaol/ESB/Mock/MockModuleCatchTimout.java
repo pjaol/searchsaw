@@ -32,8 +32,13 @@ public class MockModuleCatchTimout extends Module {
 		return result;
 	}
 
+
+
 	@Override
-	public void init(Map args) {
+	public void initializeMonitor() {}
+
+	@Override
+	public void init(Map<String, String> args) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -6,12 +6,20 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.util.NamedList;
 
 import com.pjaol.ESB.Exceptions.ModuleRunException;
 import com.pjaol.ESB.config.ESBCore;
+import com.pjaol.ESB.monitor.Monitor;
+import com.pjaol.ESB.monitor.MonitorBean;
+import com.pjaol.ESB.monitor.TYPE;
 import com.pjaol.oji.utils.TimerThread;
 
 public class Controller extends Module{
@@ -25,6 +33,12 @@ public class Controller extends Module{
 	private ESBCore core = ESBCore.getInstance();
 	private ExecutorService executorService ;
 	private Logger _logger = Logger.getLogger(getClass());
+	
+	// what to measure
+	private Monitor monit = Monitor.getInstance();
+	private MonitorBean performanceBean;
+	private MonitorBean errorBean;
+	private MonitorBean timeoutCountBean;
 	
 	@SuppressWarnings("rawtypes")
 	@Override
@@ -44,7 +58,7 @@ public class Controller extends Module{
 			public void timeout() {
 				
 				super.timeout();
-				
+				timeoutCountBean.inc(1);
 				throw new RuntimeException("Timed out: "+getName());
 			}
 		};
@@ -59,7 +73,7 @@ public class Controller extends Module{
 				
 				// this needs to go into a TimerThreadRunner
 				//pline.process(input);
-				executorService.execute(new ModuleRunner(start, stop, module, input));
+				executorService.execute(new ModuleRunner(start, stop, module, input, errorBean, timeoutCountBean));
 			}
 		}
 		
@@ -76,6 +90,9 @@ public class Controller extends Module{
 			stop.await(getTimeout(), TimeUnit.MILLISECONDS);
 			timer.halt();
 		} catch (InterruptedException e) {
+			// should really be thrown from the ModuleRunner method
+			errorBean.inc(1);
+			timeoutCountBean.inc(1);
 			throw new ModuleRunException(e.getMessage());
 			
 		}finally {
@@ -87,13 +104,41 @@ public class Controller extends Module{
 		if(_logger.getLevel() == Level.DEBUG)
 			_logger.debug("******* Shutting down ******* taken: "+ (endT - startT) +" ms" );
 		
+		performanceBean.inc(new Long(endT - startT).intValue()); // log the time
+		
 		return input;
 	}
 
 	
 	@Override
-	public void init(Map<String, String> args) {}
+	public void init(Map<String, String> args) {
+		
+		
+		
+	}
 	
+	
+	public void initializeMonitor(){
+		performanceBean = new MonitorBean(getName(), TYPE.CONTROLLER, "performance");
+		errorBean = new MonitorBean(getName(), TYPE.ERROR, "errors");
+		timeoutCountBean = new MonitorBean(getName(), TYPE.ERROR, "timeouts");
+		
+		try {
+			monit.setBean("pref-cont-"+getName(), performanceBean);
+			monit.setBean("error-cont-"+getName(), errorBean);
+			monit.setBean("timeout-cont-"+getName(), timeoutCountBean);
+		} catch (MalformedObjectNameException e) {
+			e.printStackTrace();
+		} catch (InstanceAlreadyExistsException e) {
+			e.printStackTrace();
+		} catch (MBeanRegistrationException e) {
+			e.printStackTrace();
+		} catch (NotCompliantMBeanException e) {
+			e.printStackTrace();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public void setPipelines(Map<String, List<String>> pipelines) {
 		this.pipelines = pipelines;
