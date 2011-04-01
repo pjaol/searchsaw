@@ -7,7 +7,8 @@ public class TimerThread extends Thread {
 	private int time_elapsed = 0;
 	private long timer_length;
 	private Boolean stop = false;
-
+	private final Object lock = new Object();
+	
 	static {
 		if (osName == null) {
 			osName = System.getProperty("os.name");
@@ -29,7 +30,13 @@ public class TimerThread extends Thread {
 	public void run() {
 
 		// Keep looping
-		while (!stop) {
+		while (true) {
+			
+			synchronized (lock) {
+				if (stop){
+					break;
+				}
+			}
 			// Put the timer to sleep
 			try {
 				Thread.sleep(sleep_rate);
@@ -59,7 +66,7 @@ public class TimerThread extends Thread {
 	}
 	
 	public void halt(){
-		synchronized (stop) {
+		synchronized (lock) {
 			stop = true;
 		}
 		

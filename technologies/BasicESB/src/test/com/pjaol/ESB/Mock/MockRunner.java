@@ -1,6 +1,7 @@
 package com.pjaol.ESB.Mock;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -72,9 +73,9 @@ public class MockRunner {
 		
 		System.out.println("============== Stats ==============");
 		Map<String, MonitorBean> mbeans = monit.getBeans();
-		for(String k: mbeans.keySet()){
-			System.out.println(k);
-			System.out.println("\t"+mbeans.get(k));
+		for(Entry<String, MonitorBean> k: mbeans.entrySet()){
+			System.out.println(k.getKey());
+			System.out.println("\t"+k.getValue());
 		}
 	}
 	

@@ -3,6 +3,7 @@ package com.pjaol.ESB.monitor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.solr.common.util.NamedList;
 
@@ -36,9 +37,9 @@ public class ESBMonitor extends Module {
 		List<MonitorBean> errors = new ArrayList<MonitorBean>();
 		List<MonitorBean> others = new ArrayList<MonitorBean>();
 		
-		for(String k: beans.keySet()){
+		for(Entry<String, MonitorBean> k: beans.entrySet()){
 		
-			MonitorBean bean = beans.get(k);
+			MonitorBean bean = k.getValue();
 			if (bean.getType().equals(TYPE.CONTROLLER)){
 				controllers.add(bean);
 			} else if (bean.getType().equals(TYPE.PIPELINE)){

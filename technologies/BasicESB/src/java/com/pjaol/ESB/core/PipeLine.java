@@ -10,10 +10,10 @@ import javax.management.MBeanRegistrationException;
 import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 
+import org.apache.log4j.Logger;
 import org.apache.solr.common.util.NamedList;
 
 import com.pjaol.ESB.Exceptions.ModuleNonCriticalException;
-import com.pjaol.ESB.Exceptions.ModuleRunException;
 import com.pjaol.ESB.monitor.Monitor;
 import com.pjaol.ESB.monitor.MonitorBean;
 import com.pjaol.ESB.monitor.TYPE;
@@ -26,6 +26,7 @@ public class PipeLine extends Module{
 	private Map<String, MonitorBean> prefBeans = new HashMap<String, MonitorBean>();
 	private Map<String, MonitorBean> errorBeans = new HashMap<String, MonitorBean>();
 	private Monitor monit = Monitor.getInstance();
+	private Logger _logger = Logger.getLogger(getClass());
 	
 	public List<Module> getModules() {
 		return modules;
@@ -51,6 +52,11 @@ public class PipeLine extends Module{
 	@Override
 	public NamedList process(NamedList input) throws Exception {
 		
+		if (!evaluator.evaluate(input)){
+			return null;
+		}
+			
+		
 		NamedList result = input;
 		long start = System.currentTimeMillis();
 		
@@ -65,13 +71,13 @@ public class PipeLine extends Module{
 			}catch (ModuleNonCriticalException e){
 				// non-critical exception
 				ebean.inc(1);
-				e.printStackTrace();
+				_logger.error(e);
 			} catch (Exception e){
 				ebean.inc(1);
 				throw e; // everything else should bubble up
 			}finally{
 				long now = System.currentTimeMillis();
-				pbean.inc(new Long(now -start).intValue());
+				pbean.inc(Long.valueOf(now -start).intValue());
 				start= now; // ok a couple of ticks will slip, but saves a double call to clock
 			}
 			
@@ -116,15 +122,15 @@ public class PipeLine extends Module{
 				monit.setBean("pref-"+n, pbean);
 				monit.setBean("error-"+n,ebean);
 			} catch (MalformedObjectNameException e) {
-				e.printStackTrace();
+				_logger.error(e);
 			} catch (InstanceAlreadyExistsException e) {
-				e.printStackTrace();
+				_logger.error(e);
 			} catch (MBeanRegistrationException e) {
-				e.printStackTrace();
+				_logger.error(e);
 			} catch (NotCompliantMBeanException e) {
-				e.printStackTrace();
+				_logger.error(e);
 			} catch (NullPointerException e) {
-				e.printStackTrace();
+				_logger.error(e);
 			}
 			
 		}

@@ -104,7 +104,7 @@ public class Controller extends Module{
 		if(_logger.getLevel() == Level.DEBUG)
 			_logger.debug("******* Shutting down ******* taken: "+ (endT - startT) +" ms" );
 		
-		performanceBean.inc(new Long(endT - startT).intValue()); // log the time
+		performanceBean.inc(Long.valueOf(endT - startT).intValue()); // log the time
 		
 		return input;
 	}
