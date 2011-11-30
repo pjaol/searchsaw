@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.apache.solr.common.util.NamedList;
 
+import com.pjaol.ESB.Exceptions.ModuleCriticalRunException;
 import com.pjaol.ESB.core.Module;
 
 public class MockModule extends Module {
@@ -20,6 +21,9 @@ public class MockModule extends Module {
 		System.out.println(getName()+" running with input: "+ input+" sleeping for "+ rst +"ms");
 		
 		Thread.sleep(rst);
+		
+		if (rst < 60 && rst > 50)
+			throw new ModuleCriticalRunException("I am a random error");
 		
 		
 		return result;

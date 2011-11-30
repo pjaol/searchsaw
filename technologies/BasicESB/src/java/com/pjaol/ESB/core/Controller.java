@@ -26,8 +26,8 @@ public class Controller extends Module{
 
 	private Map<String, List<String>> pipelines;
 	private List<String>pipes;
-	private List<String> limitorPipeLines;
-	private String limitorName;
+	private List<String> limiterPipeLines;
+	private String limiterName;
 	private String uri;
 	private int timeout;
 	private ESBCore core = ESBCore.getInstance();
@@ -53,12 +53,11 @@ public class Controller extends Module{
 			}
 		};
 		
-		TimerThread timer = new TimerThread(getTimeout()){
+		TimerThread timer = new TimerThread(getTimeout(), getName()){
 			@Override
 			public void timeout() {
-				
-				super.timeout();
 				timeoutCountBean.inc(1);
+				super.timeout();
 				throw new RuntimeException("Timed out: "+getName());
 			}
 		};
@@ -88,7 +87,7 @@ public class Controller extends Module{
 		try {
 			executorService.awaitTermination(getTimeout(), TimeUnit.MILLISECONDS);
 			stop.await(getTimeout(), TimeUnit.MILLISECONDS);
-			timer.halt();
+			
 		} catch (InterruptedException e) {
 			// should really be thrown from the ModuleRunner method
 			errorBean.inc(1);
@@ -99,12 +98,32 @@ public class Controller extends Module{
 			executorService.shutdownNow();
 		}
 		
+		
+		
 		long endT = System.currentTimeMillis();
 		
 		if(_logger.getLevel() == Level.DEBUG)
 			_logger.debug("******* Shutting down ******* taken: "+ (endT - startT) +" ms" );
 		
+		
+		// run limiters in serial
+		if (limiterName != null){
+		
+			for(String pipeLine : limiterPipeLines){
+				PipeLine p = core.getPipeLineByName(pipeLine);
+				try {
+					p.process(input);
+				} catch (Exception e) {
+					errorBean.inc(1);
+					throw new ModuleRunException(e.getMessage());
+				}
+			}
+		}
+		timer.halt();
+		
 		performanceBean.inc(Long.valueOf(endT - startT).intValue()); // log the time
+		errorBean.incCardinal(); // allow averages be calculated against all requests 
+		timeoutCountBean.incCardinal();
 		
 		return input;
 	}
@@ -166,19 +185,19 @@ public class Controller extends Module{
 	}
 	
 	public List<String> getLimitorPipeLines() {
-		return limitorPipeLines;
+		return limiterPipeLines;
 	}
 
 	public void setLimitorPipeLines(List<String> limitorPipeLines) {
-		this.limitorPipeLines = limitorPipeLines;
+		this.limiterPipeLines = limitorPipeLines;
 	}
 
 	public String getLimitorName() {
-		return limitorName;
+		return limiterName;
 	}
 
 	public void setLimitorName(String limitorName) {
-		this.limitorName = limitorName;
+		this.limiterName = limitorName;
 	}
 	
 	public int getTimeout() {

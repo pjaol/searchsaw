@@ -110,8 +110,8 @@ class ControllerComponent extends ConfigurationComponent{
 	private Map<String, List<String>> pipelines;
 	private List<String> pipes;
 	
-	private List<String> limitorPipeLines;
-	private String limitorName;
+	private List<String> limiterPipeLines;
+	private String limiterName;
 	
 	//TODO: is there a better way to get this?
 	private String className = "com.pjaol.ESB.core.Controller"; 
@@ -156,20 +156,20 @@ class ControllerComponent extends ConfigurationComponent{
 	}
 
 
-	public void setLimitorName(String limitorName) {
-		this.limitorName = limitorName;
+	public void setLimiterName(String limiterName) {
+		this.limiterName = limiterName;
 	}
 	
-	public String getLimitorName(){
-		return limitorName;
+	public String getLimiterName(){
+		return limiterName;
 	}
 
-	public void setLimitorPipeLines(List<String> limitorPipeLines) {
-		this.limitorPipeLines = limitorPipeLines;
+	public void setLimiterPipeLines(List<String> limiterPipeLines) {
+		this.limiterPipeLines = limiterPipeLines;
 	}
 	
-	public List<String>getLimitorPipeLines(){
-		return limitorPipeLines;
+	public List<String>getLimiterPipeLines(){
+		return limiterPipeLines;
 	}
 
 

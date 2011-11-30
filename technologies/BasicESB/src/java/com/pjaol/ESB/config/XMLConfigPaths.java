@@ -15,7 +15,7 @@ public class XMLConfigPaths {
 	
 	static XPath xpath = XPathFactory.newInstance().newXPath();
     // XPath Query for showing all nodes value
-	static XPathExpression INCLUDES, PIPELINE, CONTROLLER, EVALUATOR, ARGS, MODULES, PIPES, SUBPIPES, GLOBALS, LIMITOR ;
+	static XPathExpression INCLUDES, PIPELINE, CONTROLLER, EVALUATOR, ARGS, MODULES, PIPES, SUBPIPES, GLOBALS, LIMITER ;
 	
 	static {
 		try {
@@ -28,7 +28,7 @@ public class XMLConfigPaths {
 			PIPES = xpath.compile("./pipes");
 			SUBPIPES = xpath.compile("./pipeline");
 			GLOBALS = xpath.compile("//BasicESB/globals");
-			LIMITOR = xpath.compile("./limitor");
+			LIMITER = xpath.compile("./limiter");
 		} catch (XPathExpressionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

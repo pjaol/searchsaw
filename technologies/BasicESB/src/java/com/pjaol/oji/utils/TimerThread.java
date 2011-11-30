@@ -8,6 +8,7 @@ public class TimerThread extends Thread {
 	private long timer_length;
 	private Boolean stop = false;
 	private final Object lock = new Object();
+	private String name; 
 	
 	static {
 		if (osName == null) {
@@ -21,9 +22,10 @@ public class TimerThread extends Thread {
 	// windows x86 has a 10 ms granularity when it comes to clock accuracy
 	protected static int sleep_rate = (isWindows) ? 10 : 3;
 
-	public TimerThread(long timer_length) {
+	public TimerThread(long timer_length, String name) {
 
 		this.timer_length = timer_length;
+		this.name = name;
 	}
 
 	@Override
@@ -62,7 +64,7 @@ public class TimerThread extends Thread {
 
 	public void timeout() {
 		this.interrupt();
-		System.out.println("Timed out");
+		System.out.println("Timed out :" + name);
 	}
 	
 	public void halt(){

@@ -1,0 +1,11 @@
+<BasicESB>
+
+	<pipeline name="jmxmonitor" timeout="200">
+		<evaluator name="mockEval" class="com.pjaol.ESB.Mock.MockEvaluator"/>
+		<module name="mockModule2" class="com.pjaol.ESB.monitor.ESBMonitor" >
+			<arg name="useJMX">true</arg>
+		</module>
+	</pipeline>
+
+
+</BasicESB>

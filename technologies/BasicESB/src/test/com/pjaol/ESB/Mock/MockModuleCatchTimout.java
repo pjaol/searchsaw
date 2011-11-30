@@ -9,11 +9,12 @@ import com.pjaol.ESB.core.Module;
 
 public class MockModuleCatchTimout extends Module {
 	
+	Random rand = new Random();
 
 	@Override
 	public NamedList process(NamedList input) {
 		NamedList result = new NamedList();
-		int rst = 200;
+		int rst = rand.nextInt(200);
 		
 		result.add("randomTime", rst);
 		System.out.println(getName()+" running with input: "+ input+" sleeping for "+ rst +"ms");

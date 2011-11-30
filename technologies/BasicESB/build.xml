@@ -15,8 +15,9 @@
 	<property name="ivy.lib.dir" value="lib" />
 	<property name="build.dir" value="build" />
 	<property name="dist.dir" value="dist" />
-	<property name="src.dir" value="src" />
-
+	<property name="src.dir" value="src/java" />
+	<property name="test.src.dir" value="src/test"/>
+	<property name="compile.path" value="${src.dir}:${test.src.dir}"/>
 	<path id="classpath">
 		<fileset dir="${ivy.lib.dir}">
 			<include name="*.jar" />
@@ -58,8 +59,8 @@
           target: compile              
          ================================= -->
 	<target name="compile" description="compile java files">
-		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="classpath" debug="on" />
-		<jar destfile="${dist.dir}/${ant.project.name}.jar" />
+		<javac srcdir="${compile.path}" destdir="${build.dir}" classpathref="classpath" debug="on" />
+		<jar destfile="${dist.dir}/${ant.project.name}.jar" basedir="${build.dir}"/>
 	</target>
 
 
@@ -70,5 +71,23 @@
 		<ivy:retrieve />
 	</target>
 
-	
+	<!-- ================================= 
+          target: runMock              
+         ================================= -->
+    <target name="runMock" description="description">
+        <java classpathref="classpath" classname="com.pjaol.ESB.Mock.MockRunner" fork="true">
+        	<classpath>
+        		<fileset dir="${dist.dir}">
+        			<include name="*.jar"/>
+        		</fileset>
+        	</classpath>
+        	<arg value="example/conf/example.xml"/>
+        	<arg value="forever"/>
+        	<jvmarg value="-Dcom.sun.management.jmxremote"/>
+        	<jvmarg value="-Dcom.sun.management.jmxremote.port=1617"/>
+        	<jvmarg value="-Dcom.sun.management.jmxremote.authenticate=false"/>
+        	<jvmarg value="-Dcom.sun.management.jmxremote.ssl=false"/>
+        </java>
+    </target>
+
 </project>

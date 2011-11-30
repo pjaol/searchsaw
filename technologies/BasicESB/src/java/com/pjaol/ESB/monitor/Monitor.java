@@ -27,7 +27,7 @@ public class Monitor {
 		return monit;
 	}
 	
-	public MonitorBean getBean(String name){
+	public ESBMXBean getBean(String name){
 		return beans.get(name);
 	}
 	

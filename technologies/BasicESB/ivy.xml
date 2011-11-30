@@ -10,6 +10,7 @@
         <dependencies>
         	<dependency org="org.apache.solr" name="solr-common" rev="latest.integration"/>
         	<dependency org="log4j" name="log4j" rev="latest.integration"/>
+        	<dependency org="tomcat" name="servlet-api" rev="latest.integration"/>
         </dependencies>
 
         

@@ -45,6 +45,8 @@ public class ModuleRunner implements Runnable{
 		} finally {
 			stop.countDown();
 		}
+		
+		
 	}
 
 }

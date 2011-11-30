@@ -2,7 +2,7 @@ package com.pjaol.ESB.monitor;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MonitorBean {
+public class MonitorBean implements ESBMXBean {
 
 	private String name;
 	private String type;
@@ -18,11 +18,19 @@ public class MonitorBean {
 	}
 	
 	
+	/* (non-Javadoc)
+	 * @see com.pjaol.ESB.monitor.ESBMXBean#getName()
+	 */
+	@Override
 	public String getName() {
 		return name;
 	}
 
 
+	/* (non-Javadoc)
+	 * @see com.pjaol.ESB.monitor.ESBMXBean#getType()
+	 */
+	@Override
 	public String getType() {
 		return type;
 	}
@@ -36,8 +44,16 @@ public class MonitorBean {
 		cardinal.incrementAndGet();
 	}
 	
+	public synchronized void incCardinal(){
+		cardinal.incrementAndGet();
+	}
+	
 	// should these be synced on total & cardinal?
 	// deciding to not block setting for reporting
+	/* (non-Javadoc)
+	 * @see com.pjaol.ESB.monitor.ESBMXBean#getAverage()
+	 */
+	@Override
 	public double getAverage(){
 		int c = cardinal.get();
 		int t = total.get();
@@ -49,19 +65,35 @@ public class MonitorBean {
 	}
 	
 	
+	/* (non-Javadoc)
+	 * @see com.pjaol.ESB.monitor.ESBMXBean#getTotal()
+	 */
+	@Override
 	public int getTotal(){
 		return total.get();
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.pjaol.ESB.monitor.ESBMXBean#getCardinal()
+	 */
+	@Override
 	public int getCardinal(){
 		return cardinal.get();
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.pjaol.ESB.monitor.ESBMXBean#getMax()
+	 */
+	@Override
 	public int getMax(){
 		return max.get();
 	}
 
 
+	/* (non-Javadoc)
+	 * @see com.pjaol.ESB.monitor.ESBMXBean#getMetric()
+	 */
+	@Override
 	public String getMetric() {
 		return metric;
 	}

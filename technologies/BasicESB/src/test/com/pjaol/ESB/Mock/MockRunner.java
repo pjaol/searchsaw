@@ -23,7 +23,14 @@ public class MockRunner {
 	private Monitor monit = Monitor.getInstance();
 	
 	public static void main(String[] args) {
+		
 		String fileName = "technologies/BasicESB/example/conf/example.xml";
+		int until =100;
+		
+		if (args.length > 0){
+			fileName = args[0];
+		}
+		
 		XMLConfiguration config = new XMLConfiguration();
 		Initializer initializer = new Initializer();
 
@@ -40,11 +47,33 @@ public class MockRunner {
 		}
 
 		MockRunner mr = new MockRunner();
-		for(int i =0; i < 100; i++){
-			mr.doRun();
+		
+		if (args.length >= 2){
+			if (args[1].equals("forever")){
+				mr.runForever();
+			} else {
+				until = new Integer(args[1]).intValue();
+				mr.runUntil(until);
+			}
+		} else {
+			mr.runUntil(until);
 		}
+		
 		mr.dumpStats();
 	}
+	
+	private void runForever(){
+		while(true){
+			doRun();
+		}
+	}
+	
+	private void runUntil(int until){
+		for (int i=0; i< until; i++){
+			doRun();
+		}
+	}
+	
 	
 	private void doRun(){
 		NamedList<String> input = new NamedList<String>();

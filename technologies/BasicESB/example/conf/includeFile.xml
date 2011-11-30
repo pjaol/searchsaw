@@ -14,11 +14,11 @@
 			<pipeline name="testPipeline6" />
 		</pipes>
 
-		<limitor>
+		<limiter>
 			<pipeline />
 			<pipeline />
 			<pipeline />
-		</limitor>
+		</limiter>
 
 	</controller>
 	<pipeline name="testPipeline3" timeout="200">

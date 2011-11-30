@@ -18,11 +18,10 @@
 			<pipeline name="testPipeline3"/>
 		</pipes>
 		
-		<limitor name="limitor">
-			<pipeline/>
-			<pipeline/>
-			<pipeline/>
-		</limitor>
+		<!-- Everything here should be serial -->
+		<limiter name="limitor">
+			<pipeline name="testPipeline1"/>
+		</limiter>
 	
 	</controller>
 	
@@ -40,4 +39,5 @@
 		<module name="mockModule2" class="com.pjaol.ESB.Mock.MockModuleCatchTimout"/>
 	</pipeline>
 	<includeFile name="includeFile.xml"/>
+	<includeFile name="jmxmonitor.xml"/>
 </BasicESB>

@@ -320,7 +320,7 @@ public class XMLConfiguration {
 
 			}
 			
-			Node limit = (Node)XMLConfigPaths.LIMITOR.evaluate(c, XPathConstants.NODE);
+			Node limit = (Node)XMLConfigPaths.LIMITER.evaluate(c, XPathConstants.NODE);
 			String limitorName = getAttribute(limit, "name");
 			
 			NodeList limitSubPipes = (NodeList)XMLConfigPaths.SUBPIPES.evaluate(limit, XPathConstants.NODESET);
@@ -332,8 +332,8 @@ public class XMLConfiguration {
 				limitor.add(limitSubName);
 			}
 			
-			controller.setLimitorName(limitorName);
-			controller.setLimitorPipeLines(limitor);
+			controller.setLimiterName(limitorName);
+			controller.setLimiterPipeLines(limitor);
 			
 			controller.setPipes(pipes);
 			controller.setPipelines(pipelines);

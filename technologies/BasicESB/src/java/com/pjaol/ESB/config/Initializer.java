@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
@@ -26,7 +27,15 @@ public class Initializer {
 
 		// Initialize and put pipelines in the core
 		try {
-			core.setPipelines(startupPipes(core.getPipeLineComponent()));
+			Map<String, PipeLineComponent> pipeComponents = core.getPipeLineComponent();
+			Map<String, PipeLine> pipelines = startupPipes(pipeComponents);
+			core.setPipelines(pipelines);
+			
+			// initialize monitor after all pipelines have been init
+			// this gives the ESBMonitor pipeline the opportunity to start
+			for(Entry<String, PipeLine> k: pipelines.entrySet()){
+				k.getValue().initializeMonitor();
+			}
 		} catch (InstantiationException e) {
 			throw new ConfigurationException(e.getMessage());
 		} catch (IllegalAccessException e) {
@@ -50,6 +59,10 @@ public class Initializer {
 		// uris are created in startupControllers
 		core.setControllerUris(uris);
 
+	}
+	
+	private void initializeMonitors(){
+		
 	}
 
 	private Map<String, PipeLine> startupPipes(
@@ -77,7 +90,7 @@ public class Initializer {
 			
 			pipeline.setModules(pipeModules);
 			pipeline.init(c.getArgs());
-			pipeline.initializeMonitor();
+			//pipeline.initializeMonitor();
 			
 			result.put(c.getName(), pipeline);
 		}
@@ -113,8 +126,8 @@ public class Initializer {
 		controller.setPipes(controllerComponent.getPipes());
 		controller.setUri(controllerComponent.getUri());
 		controller.setLimitorPipeLines(controllerComponent
-				.getLimitorPipeLines());
-		controller.setLimitorName(controllerComponent.getLimitorName());
+				.getLimiterPipeLines());
+		controller.setLimitorName(controllerComponent.getLimiterName());
 		controller.setTimeout(controllerComponent.getTimeout());
 
 		controller.init(controllerComponent.getArgs());
