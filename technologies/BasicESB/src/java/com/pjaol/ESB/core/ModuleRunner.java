@@ -15,14 +15,16 @@ public class ModuleRunner implements Runnable{
 	private Module module;
 	@SuppressWarnings("rawtypes")
 	private NamedList input;
+	private NamedList output;
 	private MonitorBean errorBean, timeoutCountBean;
 	Logger _logger = Logger.getLogger(getClass());
 	
-	public ModuleRunner(CountDownLatch start, CountDownLatch stop, Module module, @SuppressWarnings("rawtypes") NamedList input, MonitorBean errorBean, MonitorBean timeoutCountBean) {
+	public ModuleRunner(CountDownLatch start, CountDownLatch stop, Module module, @SuppressWarnings("rawtypes") NamedList input,  @SuppressWarnings("rawtypes") NamedList output, MonitorBean errorBean, MonitorBean timeoutCountBean) {
 		this.start = start;
 		this.stop = stop;
 		this.module = module;
 		this.input = input;
+		this.output = output;
 		this.errorBean = errorBean;
 		this.timeoutCountBean = timeoutCountBean;
 		
@@ -34,7 +36,11 @@ public class ModuleRunner implements Runnable{
 		try {
 			start.await();
 			if(!Thread.interrupted()){
-				module.process(input);
+				output = module.process(input);
+				
+				// result of previous modules can be input to next module
+				 input.addAll(output);
+				 
 			}
 		} catch (InterruptedException e) {
 			timeoutCountBean.inc(1);

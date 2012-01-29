@@ -61,10 +61,15 @@ public class Controller extends Module{
 				throw new RuntimeException("Timed out: "+getName());
 			}
 		};
-		
+		NamedList allOutput = new NamedList();
 		for(String p: pipes){
 			// run each pipe in parallel
 			// pipelines.get(p)
+			NamedList pipeLineOutput = new NamedList();
+			
+			// all pipelines should have a clean version of the input
+			NamedList pipeLineInput = input.clone();
+			
 			List<String> pipeLinesToRun = pipelines.get(p);
 			
 			for(String pipename: pipeLinesToRun){
@@ -72,9 +77,17 @@ public class Controller extends Module{
 				
 				// this needs to go into a TimerThreadRunner
 				//pline.process(input);
-				executorService.execute(new ModuleRunner(start, stop, module, input, errorBean, timeoutCountBean));
+				executorService.execute(new ModuleRunner(start, stop, module, pipeLineInput, pipeLineOutput, errorBean, timeoutCountBean));
 			}
+			
+			// The output of a pipeline should be added to 
+			// all output
+			allOutput.addAll(pipeLineOutput);
+			
 		}
+		
+		//
+		input.addAll(allOutput);
 		
 		if(_logger.getLevel() == Level.DEBUG)
 			_logger.debug("******* Starting *******");
@@ -112,7 +125,8 @@ public class Controller extends Module{
 			for(String pipeLine : limiterPipeLines){
 				PipeLine p = core.getPipeLineByName(pipeLine);
 				try {
-					p.process(input);
+					//TODO: do i want to set this exclusively ?
+					allOutput.addAll(p.process(input));
 				} catch (Exception e) {
 					errorBean.inc(1);
 					throw new ModuleRunException(e.getMessage());
