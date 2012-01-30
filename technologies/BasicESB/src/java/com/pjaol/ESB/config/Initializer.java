@@ -1,5 +1,11 @@
 package com.pjaol.ESB.config;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +31,9 @@ public class Initializer {
 	 */
 	public void startup() throws ConfigurationException {
 
+		// add libs to the classpath
+		addLibs();
+		
 		// Initialize and put pipelines in the core
 		try {
 			Map<String, PipeLineComponent> pipeComponents = core.getPipeLineComponent();
@@ -169,4 +178,64 @@ public class Initializer {
 			IllegalAccessException, ClassNotFoundException {
 		return (T) Class.forName(className).newInstance();
 	}
+	
+	
+	private void addLibs(){
+		Map<String, String> globals = core.getGlobals();
+		String libs = globals.get("lib");
+		if (libs != null){
+			String [] libPaths = libs.split(",|\n");
+			for(String path : libPaths){
+				path = path.trim();
+				File f = new File(path);
+				
+				if (! f.exists()){
+					// search for the path from the basicesb home
+					String home = System.getProperty(BasicESBVariables.basicESBHomeProperty);
+					String homePath = home+File.separatorChar+path;
+					f = new File(homePath);
+					if (! f.exists()){
+						String cwd = new File(".").getAbsolutePath();
+						_logger.error("Loading lib : " + path+" failed at "+ cwd+" and "+homePath );
+						continue;
+					}
+				}
+
+				
+				_logger.info("Loading path: "+ path);
+				
+				String[] jars = f.list(new FilenameFilter() {
+					
+					@Override
+					public boolean accept(File dir, String fileName) {
+						return fileName.endsWith(".jar");
+					}
+				});
+				
+				for(String jar: jars){
+					try {
+						addPath(jar);
+						_logger.info("Adding jar: "+ jar);
+					} catch (Exception e) {
+						_logger.error("Failed to load jar: "+jar+"\n"+ e.getMessage());
+						e.printStackTrace();
+					}
+				}
+				
+				
+			}
+		}
+	}
+	
+	public static void addPath(String s) throws Exception {
+		  File f = new File(s);
+		  URI fURI = f.toURI();
+		  URL u = fURI.toURL();
+		  
+		  URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+		  Class urlClass = URLClassLoader.class;
+		  Method method = urlClass.getDeclaredMethod("addURL", new Class[]{URL.class});
+		  method.setAccessible(true);
+		  method.invoke(urlClassLoader, new Object[]{u});
+		}
 }

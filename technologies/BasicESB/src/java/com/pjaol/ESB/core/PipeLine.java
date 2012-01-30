@@ -17,6 +17,7 @@ import com.pjaol.ESB.Exceptions.ModuleNonCriticalException;
 import com.pjaol.ESB.monitor.Monitor;
 import com.pjaol.ESB.monitor.MonitorBean;
 import com.pjaol.ESB.monitor.TYPE;
+import com.pjaol.oji.utils.TimerThread;
 
 public class PipeLine extends Module{
 	
@@ -56,6 +57,14 @@ public class PipeLine extends Module{
 			return null;
 		}
 			
+		TimerThread timer = new TimerThread(getTimeout(), getName(), "pipeline"){
+			@Override
+			public void timeout() {
+				
+				super.timeout();
+				throw new RuntimeException("Timed out pipeline: "+getName());
+			}
+		};
 		
 		NamedList result = input;
 		long start = System.currentTimeMillis();

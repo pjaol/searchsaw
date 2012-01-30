@@ -321,20 +321,22 @@ public class XMLConfiguration {
 			}
 			
 			Node limit = (Node)XMLConfigPaths.LIMITER.evaluate(c, XPathConstants.NODE);
-			String limitorName = getAttribute(limit, "name");
-			
-			NodeList limitSubPipes = (NodeList)XMLConfigPaths.SUBPIPES.evaluate(limit, XPathConstants.NODESET);
-			int lspSz = limitSubPipes.getLength();
-			
-			for (int y = 0; y < lspSz; y++){
-				Node n = limitSubPipes.item(y);
-				String limitSubName = getAttribute(n, "name");
-				limitor.add(limitSubName);
+			if (limit != null) {
+				String limitorName = getAttribute(limit, "name");
+
+				NodeList limitSubPipes = (NodeList) XMLConfigPaths.SUBPIPES
+						.evaluate(limit, XPathConstants.NODESET);
+				int lspSz = limitSubPipes.getLength();
+
+				for (int y = 0; y < lspSz; y++) {
+					Node n = limitSubPipes.item(y);
+					String limitSubName = getAttribute(n, "name");
+					limitor.add(limitSubName);
+				}
+
+				controller.setLimiterName(limitorName);
+				controller.setLimiterPipeLines(limitor);
 			}
-			
-			controller.setLimiterName(limitorName);
-			controller.setLimiterPipeLines(limitor);
-			
 			controller.setPipes(pipes);
 			controller.setPipelines(pipelines);
 			controllers.put(controller.getName(), controller);

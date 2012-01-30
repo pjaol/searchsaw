@@ -1,0 +1,53 @@
+<BasicESB>
+
+	<globals>
+		<arg name="fu">bar</arg>
+		<arg name="lib">/Users/pjaol/Documents/workspace/searchsaw/technologies/BasicESB/lib
+		/a/path,/b/path</arg>
+	</globals>
+	
+	<controller uri="/" name="default" timeout="100">
+	
+		<pipes name="batch1">
+			<pipeline name="echoPipeline1"/>
+			<pipeline name="testPipeline2"/>
+			<!--  <pipeline name="testPipeline3"/> -->
+		</pipes>
+		<!-- 
+		<pipes name="batch2">
+			<pipeline name="testPipeline1"/>
+			<pipeline name="testPipeline2"/>
+			
+		</pipes>
+		 -->
+		<!-- Everything here should be serial -->
+		<limiter name="limitor">
+			<pipeline name="testPipeline1"/>
+		</limiter>
+	
+	</controller>
+	
+	<pipeline name="testPipeline1" timeout="200">
+		<evaluator name="mockEval" class="com.pjaol.ESB.Mock.MockEvaluator">
+			<arg name="arg1">lalala</arg>
+		</evaluator>
+		<module name="mockModule1" class="com.pjaol.ESB.Mock.MockModule"/>
+	</pipeline>
+	
+	<pipeline name="testPipeline2" timeout="200">
+		<evaluator name="mockEval" class="com.pjaol.ESB.Mock.MockEvaluator">
+			<arg name="arg1">lalala</arg>
+		</evaluator>
+		<module name="mockModule2" class="com.pjaol.ESB.Mock.MockModuleCatchTimout"/>
+	</pipeline>
+	
+	<pipeline name="echoPipeline1" timeout="200">
+		<evaluator name="mockEval" class="com.pjaol.ESB.Mock.MockEvaluator">
+			<arg name="arg1">lalala</arg>
+		</evaluator>
+		<module name="mockModuleEchoInput" class="com.pjaol.ESB.Mock.MockModuleEchoInput"/>
+	</pipeline>
+	
+	<!-- <includeFile name="includeFile.xml"/> -->
+	<includeFile name="jmxmonitor.xml"/>
+</BasicESB>

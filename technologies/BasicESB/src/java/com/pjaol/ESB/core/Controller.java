@@ -53,12 +53,12 @@ public class Controller extends Module{
 			}
 		};
 		
-		TimerThread timer = new TimerThread(getTimeout(), getName()){
+		TimerThread timer = new TimerThread(getTimeout(), getName(), "controller"){
 			@Override
 			public void timeout() {
 				timeoutCountBean.inc(1);
 				super.timeout();
-				throw new RuntimeException("Timed out: "+getName());
+				throw new RuntimeException("Timed out controller: "+getName());
 			}
 		};
 		NamedList allOutput = new NamedList();

@@ -21,7 +21,7 @@
 	<path id="classpath">
 		<fileset dir="${ivy.lib.dir}">
 			<include name="*.jar" />
-			<exclude name="servlet-api*" />
+			<!--<exclude name="servlet-api*" />-->
 		</fileset>
 
 	</path>
@@ -54,6 +54,14 @@
 		<delete dir="${build.dir}" />
 		<delete dir="${dist.dir}" />
 	</target>
+	
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: fullclean                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="fullclean" depends="clean">
+    	<delete dir="${ivy.lib.dir}"/>
+    </target>
+
 
 	<!-- ================================= 
           target: compile              
@@ -61,6 +69,13 @@
 	<target name="compile" description="compile java files">
 		<javac srcdir="${compile.path}" destdir="${build.dir}" classpathref="classpath" debug="on" />
 		<jar destfile="${dist.dir}/${ant.project.name}.jar" basedir="${build.dir}"/>
+		
+		<war destfile="${dist.dir}/${ant.project.name}.war"  
+			webxml="src/web/conf/web.xml">
+			
+			<lib dir="${ivy.lib.dir}" excludes="servlet-api*"/>
+			<lib file="${dist.dir}/${ant.project.name}.jar"/>
+		</war>
 	</target>
 
 
