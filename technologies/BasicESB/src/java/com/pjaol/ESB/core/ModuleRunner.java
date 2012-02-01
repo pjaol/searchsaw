@@ -15,16 +15,16 @@ public class ModuleRunner implements Runnable{
 	private Module module;
 	@SuppressWarnings("rawtypes")
 	private NamedList input;
-	private NamedList output;
+	private NamedList output = new NamedList();
 	private MonitorBean errorBean, timeoutCountBean;
 	Logger _logger = Logger.getLogger(getClass());
 	
-	public ModuleRunner(CountDownLatch start, CountDownLatch stop, Module module, @SuppressWarnings("rawtypes") NamedList input,  @SuppressWarnings("rawtypes") NamedList output, MonitorBean errorBean, MonitorBean timeoutCountBean) {
+	public ModuleRunner(CountDownLatch start, CountDownLatch stop, Module module, @SuppressWarnings("rawtypes") NamedList input,  MonitorBean errorBean, MonitorBean timeoutCountBean) {
 		this.start = start;
 		this.stop = stop;
 		this.module = module;
 		this.input = input;
-		this.output = output;
+		
 		this.errorBean = errorBean;
 		this.timeoutCountBean = timeoutCountBean;
 		
@@ -37,9 +37,11 @@ public class ModuleRunner implements Runnable{
 			start.await();
 			if(!Thread.interrupted()){
 				output = module.process(input);
-				
+				//System.out.println("****:"+module.getName()+":::"+output);
 				// result of previous modules can be input to next module
-				 input.addAll(output);
+				//input.addAll(output);
+				//input.add("should not appear", "why am i here");
+				
 				 
 			}
 		} catch (InterruptedException e) {
@@ -48,6 +50,7 @@ public class ModuleRunner implements Runnable{
 		} catch (Exception e) {
 			errorBean.inc(1); // a timeout might not be an error?
 			_logger.error(e);
+			e.printStackTrace();
 		} finally {
 			stop.countDown();
 		}
@@ -55,4 +58,8 @@ public class ModuleRunner implements Runnable{
 		
 	}
 
+	
+	public NamedList getOutput(){
+		return this.output;
+	}
 }

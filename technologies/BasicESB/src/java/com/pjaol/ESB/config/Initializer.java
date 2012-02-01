@@ -46,11 +46,11 @@ public class Initializer {
 				k.getValue().initializeMonitor();
 			}
 		} catch (InstantiationException e) {
-			throw new ConfigurationException(e.getMessage());
+			throw new ConfigurationException(e);
 		} catch (IllegalAccessException e) {
-			throw new ConfigurationException(e.getMessage());
+			throw new ConfigurationException(e);
 		} catch (ClassNotFoundException e) {
-			throw new ConfigurationException(e.getMessage());
+			throw new ConfigurationException(e);
 		}
 
 		// Initialize and put controllers in the core
@@ -176,13 +176,18 @@ public class Initializer {
 	@SuppressWarnings("unchecked")
 	private <T> T extracted(String className) throws InstantiationException,
 			IllegalAccessException, ClassNotFoundException {
-		return (T) Class.forName(className).newInstance();
+		return (T) Thread.currentThread().getContextClassLoader().getClass().forName(className).newInstance();
+		//return (T) Class.forName(className).newInstance();
 	}
 	
 	
 	private void addLibs(){
 		Map<String, String> globals = core.getGlobals();
 		String libs = globals.get("lib");
+		URLClassLoader urlClassLoader = (URLClassLoader)Thread.currentThread().getContextClassLoader().getParent();
+		
+		URL[] urls = urlClassLoader.getURLs();
+		
 		if (libs != null){
 			String [] libPaths = libs.split(",|\n");
 			for(String path : libPaths){
@@ -214,7 +219,7 @@ public class Initializer {
 				
 				for(String jar: jars){
 					try {
-						addPath(jar);
+						addPath(path+File.separator+jar);
 						_logger.info("Adding jar: "+ jar);
 					} catch (Exception e) {
 						_logger.error("Failed to load jar: "+jar+"\n"+ e.getMessage());
@@ -232,10 +237,13 @@ public class Initializer {
 		  URI fURI = f.toURI();
 		  URL u = fURI.toURL();
 		  
-		  URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+		  
+		  URLClassLoader urlClassLoader = (URLClassLoader) Thread.currentThread().getContextClassLoader(); 
 		  Class urlClass = URLClassLoader.class;
 		  Method method = urlClass.getDeclaredMethod("addURL", new Class[]{URL.class});
 		  method.setAccessible(true);
 		  method.invoke(urlClassLoader, new Object[]{u});
+		  
+		  
 		}
 }

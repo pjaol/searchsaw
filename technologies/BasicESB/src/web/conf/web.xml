@@ -9,6 +9,7 @@
 	<servlet>
 		<servlet-name>BasicESB</servlet-name>
 		<servlet-class>com.pjaol.ESB.web.HTTPAPI</servlet-class>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 
 	<servlet-mapping>

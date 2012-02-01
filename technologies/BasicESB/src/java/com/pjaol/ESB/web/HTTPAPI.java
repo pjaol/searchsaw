@@ -49,9 +49,8 @@ public class HTTPAPI extends HttpServlet{
 
 		// finding the config file
 		// 1. look for basicesb.home system property + conf/esbconfig.xml
-		// 2. look for java runtime directory + basicesb/conf/esbconfig.xml
+		// 2. look in current working directory + basicesb/conf/esbconfig.xml
 
-		//TODO: create a strings class
 		String homeDir = System.getProperty(BasicESBVariables.basicESBHomeProperty);
 		
 		if (homeDir == null){
@@ -94,14 +93,10 @@ public class HTTPAPI extends HttpServlet{
 		try {
 			results = controller.process(input);
 		} catch (ModuleRunException e) {
-			System.err.println("******** Caught exception here");
 			throw new ServletException(e);
 		}
 		
-		Map foo = new HashMap();
-		foo.put("lalala", "wee");
 		
-		results.add("maptest", foo);
 		
 		String format = req.getParameter("format");
 		

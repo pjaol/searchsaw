@@ -1,7 +1,9 @@
 package com.pjaol.ESB.core;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -61,11 +63,15 @@ public class Controller extends Module{
 				throw new RuntimeException("Timed out controller: "+getName());
 			}
 		};
+		
 		NamedList allOutput = new NamedList();
+		
+		List<ModuleRunner> moduleRunners = new ArrayList<ModuleRunner>();
+		
 		for(String p: pipes){
 			// run each pipe in parallel
 			// pipelines.get(p)
-			NamedList pipeLineOutput = new NamedList();
+			
 			
 			// all pipelines should have a clean version of the input
 			NamedList pipeLineInput = input.clone();
@@ -77,17 +83,20 @@ public class Controller extends Module{
 				
 				// this needs to go into a TimerThreadRunner
 				//pline.process(input);
-				executorService.execute(new ModuleRunner(start, stop, module, pipeLineInput, pipeLineOutput, errorBean, timeoutCountBean));
+				ModuleRunner runner = new ModuleRunner(start, stop, module, pipeLineInput, errorBean, timeoutCountBean);
+				executorService.execute(runner);
+				moduleRunners.add(runner);
+				
 			}
 			
 			// The output of a pipeline should be added to 
 			// all output
-			allOutput.addAll(pipeLineOutput);
+			//allOutput.addAll(pipeLineOutput);
 			
 		}
 		
 		//
-		input.addAll(allOutput);
+		//input.addAll(allOutput);
 		
 		if(_logger.getLevel() == Level.DEBUG)
 			_logger.debug("******* Starting *******");
@@ -98,6 +107,7 @@ public class Controller extends Module{
 		timer.start();
 		
 		try {
+			executorService.shutdown();
 			executorService.awaitTermination(getTimeout(), TimeUnit.MILLISECONDS);
 			stop.await(getTimeout(), TimeUnit.MILLISECONDS);
 			
@@ -112,8 +122,16 @@ public class Controller extends Module{
 		}
 		
 		
+		for(ModuleRunner runner: moduleRunners){
+			allOutput.addAll(runner.getOutput());
+		}
+		
+		//System.out.println("Shutdown called with "+ allOutput+"::");
 		
 		long endT = System.currentTimeMillis();
+		long timeTaken = endT - startT;
+		
+		allOutput.add("QTime", timeTaken);
 		
 		if(_logger.getLevel() == Level.DEBUG)
 			_logger.debug("******* Shutting down ******* taken: "+ (endT - startT) +" ms" );
@@ -139,7 +157,7 @@ public class Controller extends Module{
 		errorBean.incCardinal(); // allow averages be calculated against all requests 
 		timeoutCountBean.incCardinal();
 		
-		return input;
+		return allOutput;
 	}
 
 	

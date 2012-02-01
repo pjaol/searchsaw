@@ -77,6 +77,7 @@ public class PipeLine extends Module{
 			
 			try {
 				moduleResult = module.process(input);
+				//System.out.println("****:pipeline:"+getName()+"::"+module.getName()+"::"+moduleResult);
 			}catch (ModuleNonCriticalException e){
 				// non-critical exception
 				ebean.inc(1);
@@ -94,7 +95,8 @@ public class PipeLine extends Module{
 			result.add(module.getName(), moduleResult);
 		}
 		
-			
+		//System.out.println("################"+result);
+		
 		return result;
 	}
 
