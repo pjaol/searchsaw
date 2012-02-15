@@ -35,7 +35,7 @@ public class XMLFormatter extends Formatter {
 		
 		for(int i =0; i < sz; i++){
 			String k = output.getName(i);
-			Object v = output.get(k);
+			Object v = output.getVal(i);
 			sb.append("<f name=\""+k+"\">");
 			if (v instanceof Map){
 				sb.append(recurseMap((Map)v));
@@ -76,7 +76,7 @@ public class XMLFormatter extends Formatter {
 				sb.append(recurseNamedList((NamedList)v));
 			} else {
 				
-				sb.append("<f>"+v.toString()+"</f>");
+				sb.append(new String(v.toString()));
 			}
 			sb.append("</f>");
 		}
