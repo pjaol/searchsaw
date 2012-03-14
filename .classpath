@@ -2,8 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="technologies/BasicESB/src/java"/>
 	<classpathentry kind="src" path="technologies/BasicESB/src/test"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?ivyXmlPath=technologies%2FBasicESB%2Fivy.xml&amp;confs=*"/>
 	<classpathentry kind="lib" path="technologies/BasicESB/example/conf"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
