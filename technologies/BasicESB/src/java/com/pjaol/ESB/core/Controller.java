@@ -42,10 +42,20 @@ public class Controller extends Module{
 	private MonitorBean errorBean;
 	private MonitorBean timeoutCountBean;
 	
+	/**
+	 * Controllers are stored in the ESBCore
+	 * 
+	 */
+	public Controller() { }
+	
+	
 	@SuppressWarnings("rawtypes")
 	@Override
 	public NamedList process(NamedList input) throws ModuleRunException {
+		
+		
 		CountDownLatch start = new CountDownLatch(1);
+		
 		CountDownLatch stop = new CountDownLatch(pipes.size()){
 			@Override
 			public boolean await(long timeout, TimeUnit unit)
@@ -64,26 +74,25 @@ public class Controller extends Module{
 			}
 		};
 		
-		NamedList allOutput = new NamedList();
 		
+		NamedList allOutput = new NamedList();
 		List<ModuleRunner> moduleRunners = new ArrayList<ModuleRunner>();
 		
+		// Pipes have little to no value
+		// TODO: should pipes be converted to run in parallel?
+		
 		for(String p: pipes){
-			// run each pipe in parallel
-			// pipelines.get(p)
 			
-			
-			// all pipelines should have a clean version of the input
-			NamedList pipeLineInput = input.clone();
-			
+			// run each pipe in parallel			
 			List<String> pipeLinesToRun = pipelines.get(p);
 			
 			for(String pipename: pipeLinesToRun){
-				PipeLine module = core.getPipeLineByName(pipename);
+				PipeLine pipeline = core.getPipeLineByName(pipename);
 				
-				// this needs to go into a TimerThreadRunner
-				//pline.process(input);
-				ModuleRunner runner = new ModuleRunner(start, stop, module, pipeLineInput, errorBean, timeoutCountBean);
+				// all pipelines should have a clean version of the input
+				NamedList pipeLineInput = input.clone();
+				
+				ModuleRunner runner = new ModuleRunner(start, stop, pipeline, pipeLineInput, errorBean, timeoutCountBean);
 				executorService.execute(runner);
 				moduleRunners.add(runner);
 				

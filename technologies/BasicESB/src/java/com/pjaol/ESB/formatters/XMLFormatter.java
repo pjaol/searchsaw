@@ -44,7 +44,10 @@ public class XMLFormatter extends Formatter {
 			} else if (v instanceof NamedList){
 				sb.append(recurseNamedList((NamedList)v));
 			} else {
-				sb.append(v.toString());
+				if (v != null){
+					//TODO: quick xml encoder?
+					sb.append(v.toString());
+				}
 			}
 			
 			sb.append("</f>");

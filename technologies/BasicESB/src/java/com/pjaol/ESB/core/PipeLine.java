@@ -66,7 +66,11 @@ public class PipeLine extends Module{
 			}
 		};
 		
-		NamedList result = input;
+		
+		NamedList inputResult = input; // Input & Output combined
+		NamedList result = new NamedList(); // Result returned from pipeline
+		
+		
 		long start = System.currentTimeMillis();
 		
 		
@@ -92,10 +96,12 @@ public class PipeLine extends Module{
 			}
 			
 
-			result.add(module.getName(), moduleResult);
+			inputResult.add(module.getName(), moduleResult); // Copy the result of a module to the input
+															 // of the next module
+			
+			result.add(module.getName(), moduleResult); // Only store the result of modules for returning
 		}
 		
-		//System.out.println("################"+result);
 		
 		return result;
 	}

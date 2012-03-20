@@ -36,13 +36,9 @@ public class ModuleRunner implements Runnable{
 		try {
 			start.await();
 			if(!Thread.interrupted()){
-				output = module.process(input);
-				//System.out.println("****:"+module.getName()+":::"+output);
-				// result of previous modules can be input to next module
-				//input.addAll(output);
-				//input.add("should not appear", "why am i here");
 				
-				 
+				output = module.process(input);
+				
 			}
 		} catch (InterruptedException e) {
 			timeoutCountBean.inc(1);
