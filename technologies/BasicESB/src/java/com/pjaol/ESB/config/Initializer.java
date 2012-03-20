@@ -219,8 +219,9 @@ public class Initializer {
 				
 				for(String jar: jars){
 					try {
-						addPath(path+File.separator+jar);
-						_logger.info("Adding jar: "+ jar);
+						String fullPath = path+File.separator+jar;
+						addPath(fullPath);
+						_logger.info("Adding jar: "+ fullPath);
 					} catch (Exception e) {
 						_logger.error("Failed to load jar: "+jar+"\n"+ e.getMessage());
 						e.printStackTrace();
@@ -234,6 +235,10 @@ public class Initializer {
 	
 	public static void addPath(String s) throws Exception {
 		  File f = new File(s);
+		  if (! f.exists()){
+			  System.err.println("Cannot file file: "+ s);
+		  }
+		  
 		  URI fURI = f.toURI();
 		  URL u = fURI.toURL();
 		  
