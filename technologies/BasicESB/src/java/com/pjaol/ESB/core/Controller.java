@@ -138,9 +138,9 @@ public class Controller extends Module{
 		//System.out.println("Shutdown called with "+ allOutput+"::");
 		
 		long endT = System.currentTimeMillis();
-		long timeTaken = endT - startT;
 		
-		allOutput.add("QTime", timeTaken);
+		
+		
 		
 		if(_logger.getLevel() == Level.DEBUG)
 			_logger.debug("******* Shutting down ******* taken: "+ (endT - startT) +" ms" );
@@ -148,20 +148,30 @@ public class Controller extends Module{
 		
 		// run limiters in serial
 		if (limiterName != null){
-		
+			//Input should be cloned and output added from previous pipelines
+			NamedList limiterOutput = new NamedList();
+			input.addAll(allOutput);
+			NamedList limiterInput = input.clone();
+			
 			for(String pipeLine : limiterPipeLines){
+				
 				PipeLine p = core.getPipeLineByName(pipeLine);
 				try {
 					//TODO: do i want to set this exclusively ?
-					allOutput.addAll(p.process(input));
+					limiterOutput.addAll(p.process(limiterInput));
 				} catch (Exception e) {
 					errorBean.inc(1);
 					throw new ModuleRunException(e.getMessage());
 				}
 			}
+			
+			allOutput = limiterOutput;
 		}
-		timer.halt();
 		
+		long timeTaken = endT - startT;
+		
+		timer.halt();
+		allOutput.add("QTime", timeTaken);
 		performanceBean.inc(Long.valueOf(endT - startT).intValue()); // log the time
 		errorBean.incCardinal(); // allow averages be calculated against all requests 
 		timeoutCountBean.incCardinal();

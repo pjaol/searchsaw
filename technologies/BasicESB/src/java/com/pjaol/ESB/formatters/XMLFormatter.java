@@ -46,7 +46,9 @@ public class XMLFormatter extends Formatter {
 			} else {
 				if (v != null){
 					//TODO: quick xml encoder?
-					sb.append(v.toString());
+					//sb.append("<![CDATA[");
+					sb.append(StringSimplifier.simplifiedString(v.toString()));
+					//sb.append("]]>");
 				}
 			}
 			
@@ -78,8 +80,9 @@ public class XMLFormatter extends Formatter {
 				
 				sb.append(recurseNamedList((NamedList)v));
 			} else {
-				
-				sb.append(new String(v.toString()));
+				//sb.append("<![CDATA[");
+				sb.append(StringSimplifier.simplifiedString(new String(v.toString())));
+				//sb.append("]]>");
 			}
 			sb.append("</f>");
 		}
@@ -98,12 +101,17 @@ public class XMLFormatter extends Formatter {
 			} else if (i instanceof Map){
 				sb.append(recurseMap((Map)i));
 			} else {
-				sb.append("<f>"+i.toString()+"</f>");
+				sb.append("<f>");
+				//sb.append("<![CDATA[");
+				sb.append(StringSimplifier.simplifiedString(i.toString()));
+				//sb.append("]]>");
+				sb.append("</f>");
 			}
 			
 		}
 		
 		return sb.toString();
 	}
+	
 	
 }
