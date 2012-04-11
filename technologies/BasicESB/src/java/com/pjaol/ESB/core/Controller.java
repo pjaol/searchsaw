@@ -18,7 +18,6 @@ package com.pjaol.ESB.core;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -39,179 +38,176 @@ import com.pjaol.ESB.monitor.MonitorBean;
 import com.pjaol.ESB.monitor.TYPE;
 import com.pjaol.oji.utils.TimerThread;
 
-public class Controller extends Module{
+public class Controller extends Module {
 
 	private Map<String, List<String>> pipelines;
-	private List<String>pipes;
+	private List<String> pipes;
 	private List<String> limiterPipeLines;
 	private String limiterName;
 	private String uri;
 	private int timeout;
 	private ESBCore core = ESBCore.getInstance();
-	private ExecutorService executorService ;
+	private ExecutorService executorService;
 	private Logger _logger = Logger.getLogger(getClass());
-	
+
 	// what to measure
 	private Monitor monit = Monitor.getInstance();
 	private MonitorBean performanceBean;
 	private MonitorBean errorBean;
 	private MonitorBean timeoutCountBean;
-	
+
 	/**
 	 * Controllers are stored in the ESBCore
 	 * 
 	 */
-	public Controller() { }
-	
-	
+	public Controller() {
+	}
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	public NamedList process(NamedList input) throws ModuleRunException {
-		
-		
+
 		CountDownLatch start = new CountDownLatch(1);
-		
-		CountDownLatch stop = new CountDownLatch(pipes.size()){
+
+		CountDownLatch stop = new CountDownLatch(pipes.size()) {
 			@Override
 			public boolean await(long timeout, TimeUnit unit)
 					throws InterruptedException {
-				
+
 				return super.await(timeout, unit);
 			}
 		};
-		
-		TimerThread timer = new TimerThread(getTimeout(), getName(), "controller"){
+
+		TimerThread timer = new TimerThread(getTimeout(), getName(),
+				"controller") {
 			@Override
 			public void timeout() {
 				timeoutCountBean.inc(1);
 				super.timeout();
-				throw new RuntimeException("Timed out controller: "+getName());
+				throw new RuntimeException("Timed out controller: " + getName());
 			}
 		};
-		
-		
+
 		NamedList allOutput = new NamedList();
 		List<ModuleRunner> moduleRunners = new ArrayList<ModuleRunner>();
-		
+
 		// Pipes have little to no value
 		// TODO: should pipes be converted to run in parallel?
-		
-		for(String p: pipes){
-			
-			// run each pipe in parallel			
+
+		for (String p : pipes) {
+
+			// run each pipe in parallel
 			List<String> pipeLinesToRun = pipelines.get(p);
-			
-			for(String pipename: pipeLinesToRun){
+
+			for (String pipename : pipeLinesToRun) {
 				PipeLine pipeline = core.getPipeLineByName(pipename);
-				
+
 				// all pipelines should have a clean version of the input
 				NamedList pipeLineInput = input.clone();
-				
-				ModuleRunner runner = new ModuleRunner(start, stop, pipeline, pipeLineInput, errorBean, timeoutCountBean);
+
+				ModuleRunner runner = new ModuleRunner(start, stop, pipeline,
+						pipeLineInput, errorBean, timeoutCountBean);
 				executorService.execute(runner);
 				moduleRunners.add(runner);
-				
+
 			}
-			
-			// The output of a pipeline should be added to 
+
+			// The output of a pipeline should be added to
 			// all output
-			//allOutput.addAll(pipeLineOutput);
-			
+			// allOutput.addAll(pipeLineOutput);
+
 		}
-		
+
 		//
-		//input.addAll(allOutput);
-		
-		if(_logger.getLevel() == Level.DEBUG)
+		// input.addAll(allOutput);
+
+		if (_logger.getLevel() == Level.DEBUG)
 			_logger.debug("******* Starting *******");
-		
-		
+
 		long startT = System.currentTimeMillis();
 		start.countDown();
 		timer.start();
-		
+
 		try {
 			executorService.shutdown();
-			executorService.awaitTermination(getTimeout(), TimeUnit.MILLISECONDS);
+			executorService.awaitTermination(getTimeout(),
+					TimeUnit.MILLISECONDS);
 			stop.await(getTimeout(), TimeUnit.MILLISECONDS);
-			
+
 		} catch (InterruptedException e) {
 			// should really be thrown from the ModuleRunner method
 			errorBean.inc(1);
 			timeoutCountBean.inc(1);
 			throw new ModuleRunException(e.getMessage());
-			
-		}finally {
+
+		} finally {
 			executorService.shutdownNow();
 		}
-		
-		
-		for(ModuleRunner runner: moduleRunners){
-			allOutput.addAll(runner.getOutput());
+
+		for (ModuleRunner runner : moduleRunners) {
+			NamedList data = runner.getOutput();
+			if (data != null)
+				allOutput.addAll(data);
 		}
-		
-		//System.out.println("Shutdown called with "+ allOutput+"::");
-		
+
+		// System.out.println("Shutdown called with "+ allOutput+"::");
+
 		long endT = System.currentTimeMillis();
-		
-		
-		
-		
-		if(_logger.getLevel() == Level.DEBUG)
-			_logger.debug("******* Shutting down ******* taken: "+ (endT - startT) +" ms" );
-		
-		
+
+		if (_logger.getLevel() == Level.DEBUG)
+			_logger.debug("******* Shutting down ******* taken: "
+					+ (endT - startT) + " ms");
+
 		// run limiters in serial
-		if (limiterName != null){
-			//Input should be cloned and output added from previous pipelines
+		if (limiterName != null) {
+			// Input should be cloned and output added from previous pipelines
 			NamedList limiterOutput = new NamedList();
 			input.addAll(allOutput);
 			NamedList limiterInput = input.clone();
-			
-			for(String pipeLine : limiterPipeLines){
-				
+
+			for (String pipeLine : limiterPipeLines) {
+
 				PipeLine p = core.getPipeLineByName(pipeLine);
 				try {
-					//TODO: do i want to set this exclusively ?
+					// TODO: do i want to set this exclusively ?
 					limiterOutput.addAll(p.process(limiterInput));
 				} catch (Exception e) {
 					errorBean.inc(1);
 					throw new ModuleRunException(e.getMessage());
 				}
 			}
-			
+
 			allOutput = limiterOutput;
 		}
-		
+
 		long timeTaken = endT - startT;
-		
+
 		timer.halt();
 		allOutput.add("QTime", timeTaken);
-		performanceBean.inc(Long.valueOf(endT - startT).intValue()); // log the time
-		errorBean.incCardinal(); // allow averages be calculated against all requests 
+		performanceBean.inc(Long.valueOf(endT - startT).intValue()); // log the
+																		// time
+		errorBean.incCardinal(); // allow averages be calculated against all
+									// requests
 		timeoutCountBean.incCardinal();
-		
+
 		return allOutput;
 	}
 
-	
 	@Override
 	public void init(Map<String, String> args) {
-		
-		
-		
+
 	}
-	
-	
-	public void initializeMonitor(){
-		performanceBean = new MonitorBean(getName(), TYPE.CONTROLLER, "performance");
+
+	public void initializeMonitor() {
+		performanceBean = new MonitorBean(getName(), TYPE.CONTROLLER,
+				"performance");
 		errorBean = new MonitorBean(getName(), TYPE.ERROR, "errors");
 		timeoutCountBean = new MonitorBean(getName(), TYPE.ERROR, "timeouts");
-		
+
 		try {
-			monit.setBean("pref-cont-"+getName(), performanceBean);
-			monit.setBean("error-cont-"+getName(), errorBean);
-			monit.setBean("timeout-cont-"+getName(), timeoutCountBean);
+			monit.setBean("pref-cont-" + getName(), performanceBean);
+			monit.setBean("error-cont-" + getName(), errorBean);
+			monit.setBean("timeout-cont-" + getName(), timeoutCountBean);
 		} catch (MalformedObjectNameException e) {
 			e.printStackTrace();
 		} catch (InstanceAlreadyExistsException e) {
@@ -233,7 +229,6 @@ public class Controller extends Module{
 		return pipelines;
 	}
 
-
 	public void setPipes(List<String> pipes) {
 		this.pipes = pipes;
 	}
@@ -249,7 +244,7 @@ public class Controller extends Module{
 	public String getUri() {
 		return uri;
 	}
-	
+
 	public List<String> getLimitorPipeLines() {
 		return limiterPipeLines;
 	}
@@ -265,7 +260,7 @@ public class Controller extends Module{
 	public void setLimitorName(String limitorName) {
 		this.limiterName = limitorName;
 	}
-	
+
 	public int getTimeout() {
 		return timeout;
 	}
@@ -274,8 +269,7 @@ public class Controller extends Module{
 		this.timeout = timeout;
 	}
 
-	
-	public void setExecutorService(ExecutorService executorService){
+	public void setExecutorService(ExecutorService executorService) {
 		this.executorService = executorService;
 	}
 }
