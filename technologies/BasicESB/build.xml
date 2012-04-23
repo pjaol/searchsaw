@@ -105,4 +105,14 @@
         </java>
     </target>
 
+	<!-- ================================= 
+          target: createPom              
+         ================================= -->
+    <target name="createPom" depends="depends" description="description">
+    	<ivy:makepom ivyfile="ivy.xml" pomfile="pom.xml">
+    	   <mapping conf="default" scope="compile"/>
+    	   <mapping conf="runtime" scope="runtime"/>
+    	</ivy:makepom>
+        
+    </target>
 </project>

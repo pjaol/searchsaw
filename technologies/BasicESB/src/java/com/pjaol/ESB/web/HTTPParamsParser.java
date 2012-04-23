@@ -24,7 +24,7 @@ import org.apache.solr.common.util.NamedList;
 public class HTTPParamsParser {
 
 	
-		public static NamedList paramsToNamedList(HttpServletRequest req){
+		public NamedList paramsToNamedList(HttpServletRequest req){
 			NamedList result = new NamedList();
 			Enumeration<String> enumeration = req.getParameterNames();
 			while(enumeration.hasMoreElements()){
@@ -39,5 +39,10 @@ public class HTTPParamsParser {
 					
 			}
 			return result;
+		}
+		
+		public String getPath(HttpServletRequest req){
+			String pathInfo=  req.getPathInfo();
+			return pathInfo;
 		}
 }

@@ -52,6 +52,7 @@ public class HTTPAPI extends HttpServlet{
 	
 	Formatter jsonFormatter = new JSONFormatter();
 	Formatter xmlFormatter = new XMLFormatter();
+	HTTPParamsParser httpParamsParser;
 	
 	/**
 	 * 
@@ -84,6 +85,18 @@ public class HTTPAPI extends HttpServlet{
 			e.printStackTrace();
 		}
 
+		String paramsParser = core.getGlobals().get("HTTPParamsParser");
+		
+		if (paramsParser != null){
+			try {
+				httpParamsParser =(HTTPParamsParser)Class.forName(paramsParser).newInstance();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			
+		} else {
+			httpParamsParser = new HTTPParamsParser();
+		}
 		
 		super.init(config);
 	}
@@ -95,9 +108,9 @@ public class HTTPAPI extends HttpServlet{
 			throws ServletException, IOException {
 		
 		NamedList<String> input = new NamedList<String>();
-		String pathInfo=  req.getPathInfo();
+		String pathInfo=  httpParamsParser.getPath(req);
 		
-		input.addAll(HTTPParamsParser.paramsToNamedList(req));
+		input.addAll(httpParamsParser.paramsToNamedList(req));
 		
 		Controller controller = core.getControllerByUri(pathInfo);
 		
