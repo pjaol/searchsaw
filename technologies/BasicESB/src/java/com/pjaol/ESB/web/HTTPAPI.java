@@ -52,6 +52,7 @@ public class HTTPAPI extends HttpServlet {
 
 	HTTPParamsParser httpParamsParser;
 
+	int threadPoolSize = 10; //can be configured from globals
 	/**
 	 * 
 	 */
@@ -96,6 +97,13 @@ public class HTTPAPI extends HttpServlet {
 		} else {
 			httpParamsParser = new HTTPParamsParser();
 		}
+		
+		String maxThreads = core.getGlobals().get("threadPoolSize");
+		if (maxThreads != null){
+			maxThreads = maxThreads.trim();
+			threadPoolSize = new Integer(maxThreads);
+		}
+		
 		super.init(config);
 	}
 
@@ -115,7 +123,7 @@ public class HTTPAPI extends HttpServlet {
 
 		Controller controller = core.getControllerByUri(pathInfo);
 
-		ExecutorService executorService = Executors.newFixedThreadPool(10);
+		ExecutorService executorService = Executors.newFixedThreadPool(threadPoolSize);
 
 		controller.setExecutorService(executorService);
 		NamedList results = null;
