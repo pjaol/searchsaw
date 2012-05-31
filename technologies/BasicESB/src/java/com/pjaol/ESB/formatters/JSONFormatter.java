@@ -41,7 +41,7 @@ public class JSONFormatter extends Formatter {
 			String k = output.getName(i);
 			
 			Object v = output.getVal(i);
-			System.out.println(k +"--"+v.getClass());
+			
 			if (v instanceof NamedList){
 				
 				jo.put(k, recurseNamedList((NamedList)v));
@@ -65,7 +65,7 @@ public class JSONFormatter extends Formatter {
 			String k = output.getName(i);
 				
 			Object v = output.getVal(i);
-			System.out.println(k +"--"+v.getClass());
+			
 			if (v instanceof NamedList){
 				
 				jo.put(k, recurseNamedList((NamedList)v));
@@ -91,7 +91,7 @@ public class JSONFormatter extends Formatter {
 		
 			String k = (String)i.next();
 			Object v = items.get(k);
-			System.out.println(k +"--"+v.getClass());
+			
 			if (v instanceof NamedList){
 				jo.put(k, recurseNamedList((NamedList)v));
 			} else if (v instanceof Map){
