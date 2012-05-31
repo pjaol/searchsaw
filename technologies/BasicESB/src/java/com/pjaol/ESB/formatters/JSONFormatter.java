@@ -15,6 +15,10 @@
  ******************************************************************************/
 package com.pjaol.ESB.formatters;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.solr.common.util.NamedList;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -37,6 +41,7 @@ public class JSONFormatter extends Formatter {
 			String k = output.getName(i);
 			
 			Object v = output.getVal(i);
+			System.out.println(k +"--"+v.getClass());
 			if (v instanceof NamedList){
 				
 				jo.put(k, recurseNamedList((NamedList)v));
@@ -60,10 +65,13 @@ public class JSONFormatter extends Formatter {
 			String k = output.getName(i);
 				
 			Object v = output.getVal(i);
+			System.out.println(k +"--"+v.getClass());
 			if (v instanceof NamedList){
 				
 				jo.put(k, recurseNamedList((NamedList)v));
-			} else {
+			} else if (v instanceof Map){
+				jo.put(k, recurseMap((Map)v));
+			}else{
 				jo.put(k, v);
 			}
 			jarr.add(jo);
@@ -73,4 +81,27 @@ public class JSONFormatter extends Formatter {
 		return jarr;
 	}
 
+	
+	private JSONObject recurseMap(Map items){
+		JSONObject jo = new JSONObject();
+		
+		Set keys = items.keySet();
+		Iterator i = keys.iterator();
+		while(i.hasNext()){
+		
+			String k = (String)i.next();
+			Object v = items.get(k);
+			System.out.println(k +"--"+v.getClass());
+			if (v instanceof NamedList){
+				jo.put(k, recurseNamedList((NamedList)v));
+			} else if (v instanceof Map){
+				jo.put(k, recurseMap((Map)v));
+			}else{
+				jo.put(k, v);
+			}	
+		}
+		
+		return jo;
+		
+	}
 }
