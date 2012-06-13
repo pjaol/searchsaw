@@ -213,6 +213,8 @@ public class Initializer {
 					// search for the path from the basicesb home
 					String home = System.getProperty(BasicESBVariables.basicESBHomeProperty);
 					String homePath = home+File.separatorChar+path;
+					path = homePath;
+					_logger.info("Switching path to "+path);
 					f = new File(homePath);
 					if (! f.exists()){
 						String cwd = new File(".").getAbsolutePath();
