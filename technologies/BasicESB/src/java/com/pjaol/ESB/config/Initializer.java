@@ -228,6 +228,12 @@ public class Initializer {
 					
 					@Override
 					public boolean accept(File dir, String fileName) {
+						// Do not load the servlet api, conflicts with servlet container
+						if (fileName.startsWith("servlet-api")){
+							_logger.info("Skipping : "+ fileName);
+							return false;
+						}
+						
 						return fileName.endsWith(".jar");
 					}
 				});
