@@ -12,12 +12,17 @@
             Core ESB for running high performance modules
     </description>
 
+	<property name="pub.revision" value="0.5"/>
+	<property name="pub.status" value="integration"/>
+	<property name="pub.resolver" value="internal"/>
 	<property name="ivy.lib.dir" value="lib" />
 	<property name="build.dir" value="build" />
 	<property name="dist.dir" value="dist" />
 	<property name="src.dir" value="src/java" />
 	<property name="test.src.dir" value="src/test"/>
 	<property name="compile.path" value="${src.dir}:${test.src.dir}"/>
+	
+	
 	<path id="classpath">
 		<fileset dir="${ivy.lib.dir}">
 			<include name="*.jar" />
@@ -115,4 +120,18 @@
     	</ivy:makepom>
         
     </target>
+	
+	<!-- publish an ivy artifact -->
+	
+	<target name="publish" depends="resolve" description="Publish this build into repository">
+	    <ivy:publish srcivypattern="ivy.xml" 
+	    	update="true" organisation="com.pjaol" 
+	    	module="BasicESB" revision="${pub.revision}" 
+	    	pubrevision="${pub.revision}" 
+	    	status="${pub.status}" resolver="${pub.resolver}" >
+	    	
+	        <artifacts pattern="${dist.dir}/[artifact].[ext]"/>
+	    </ivy:publish>
+	</target>
+	
 </project>

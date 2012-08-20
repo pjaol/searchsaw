@@ -3,10 +3,12 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
         
-        <info organisation="pjaol" module="BasicESB" status="integration">
-
+        <info organisation="com.pjaol" module="BasicESB" status="integration">
+			
         </info>
-        
+        <publications>
+        	<artifact name="BasicESB" ext="jar" type="jar"/>
+        </publications>
         <dependencies>
         	<dependency org="org.apache.solr" name="solr-common" rev="latest.integration"/>
         	<dependency org="log4j" name="log4j" rev="latest.integration"/>
