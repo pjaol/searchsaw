@@ -15,8 +15,44 @@
  ******************************************************************************/
 package com.pjaol.ESB.config;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class BasicESBVariables {
 	
 	public static final String basicESBHomeProperty = "basicesb.home";
+	
+	private static final Pattern envReplacer = Pattern.compile("\\$\\{(.+?)\\}");
+	
+	public static String populateQuery(String query) {
+
+		Matcher m = envReplacer.matcher(query);
+		StringBuffer result = new StringBuffer();
+		while (m.find()) {
+			String variable = m.group(1);
+			// pull it from a property
+			String value = System.getProperty(variable);
+			if (value == null){
+				// failing that an env
+				value = System.getenv(variable);
+			}
+			if (value == null){
+				// failing that from esb globals
+				if (ESBCore.getInstance().getGlobals().containsKey(variable)){
+					value = ESBCore.getInstance().getGlobals().get(variable);
+				}
+			}
+			
+			// sub with value or empty string if nothing found
+			if (value != null){
+				m.appendReplacement(result, value);
+			} else {
+				m.appendReplacement(result, "");
+			}
+		}
+		m.appendTail(result);
+
+		return result.toString();
+	}
 
 }

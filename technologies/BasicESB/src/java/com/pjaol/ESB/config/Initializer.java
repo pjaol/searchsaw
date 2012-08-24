@@ -26,8 +26,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.apache.solr.common.util.NamedList;
 
 import com.pjaol.ESB.core.Controller;
 import com.pjaol.ESB.core.Evaluator;
@@ -39,7 +42,7 @@ public class Initializer {
 	private Logger _logger = Logger.getLogger(getClass());
 	private ESBCore core = ESBCore.getInstance();
 	private Map<String, Controller> uris = new HashMap<String, Controller>();
-
+	
 	/**
 	 * Using Components
 	 * @throws ConfigurationException
@@ -206,6 +209,9 @@ public class Initializer {
 		if (libs != null){
 			String [] libPaths = libs.split(",|\n");
 			for(String path : libPaths){
+				
+				path = BasicESBVariables.populateQuery(path);
+				
 				path = path.trim();
 				File f = new File(path);
 				
@@ -274,4 +280,5 @@ public class Initializer {
 		  
 		  
 		}
+	
 }

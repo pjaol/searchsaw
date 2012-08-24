@@ -16,6 +16,7 @@
         	<dependency org="com.googlecode.json-simple" name="json-simple" rev="latest.integration"/>
             <dependency org="com.google.guava" name="guava" rev="latest.integration"/>
         	<!-- <dependency org="org.mortbay.jetty" name="jetty" rev="7.0.0.pre5"/> -->
+            <dependency org="junit" name="junit" rev="latest.integration"/>
             
         </dependencies>
 
