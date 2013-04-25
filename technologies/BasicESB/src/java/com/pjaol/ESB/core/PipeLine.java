@@ -25,7 +25,8 @@ import javax.management.MBeanRegistrationException;
 import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.common.util.NamedList;
 
 import com.pjaol.ESB.Exceptions.ModuleNonCriticalException;
@@ -42,7 +43,7 @@ public class PipeLine extends Module{
 	private Map<String, MonitorBean> prefBeans = new HashMap<String, MonitorBean>();
 	private Map<String, MonitorBean> errorBeans = new HashMap<String, MonitorBean>();
 	private Monitor monit = Monitor.getInstance();
-	private Logger _logger = Logger.getLogger(getClass());
+	private Logger _logger = LoggerFactory.getLogger(getClass());
 	
 	public List<Module> getModules() {
 		return modules;
@@ -100,7 +101,7 @@ public class PipeLine extends Module{
 			}catch (ModuleNonCriticalException e){
 				// non-critical exception
 				ebean.inc(1);
-				_logger.error(e);
+				_logger.error("Process Error",e);
 			} catch (Exception e){
 				ebean.inc(1);
 				throw e; // everything else should bubble up
@@ -154,15 +155,15 @@ public class PipeLine extends Module{
 				monit.setBean("pref-"+n, pbean);
 				monit.setBean("error-"+n,ebean);
 			} catch (MalformedObjectNameException e) {
-				_logger.error(e);
+				_logger.error("Initialize Error",e);
 			} catch (InstanceAlreadyExistsException e) {
-				_logger.error(e);
+				_logger.error("Initialize Error",e);
 			} catch (MBeanRegistrationException e) {
-				_logger.error(e);
+				_logger.error("Initialize Error",e);
 			} catch (NotCompliantMBeanException e) {
-				_logger.error(e);
+				_logger.error("Initialize Error",e);
 			} catch (NullPointerException e) {
-				_logger.error(e);
+				_logger.error("Initialize Error",e);
 			}
 			
 		}

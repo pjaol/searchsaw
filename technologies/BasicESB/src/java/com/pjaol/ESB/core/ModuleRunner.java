@@ -17,7 +17,8 @@ package com.pjaol.ESB.core;
 
 import java.util.concurrent.CountDownLatch;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.common.util.NamedList;
 
 import com.pjaol.ESB.Exceptions.ModuleRunException;
@@ -32,7 +33,7 @@ public class ModuleRunner implements Runnable{
 	private NamedList input;
 	private NamedList output = new NamedList();
 	private MonitorBean errorBean, timeoutCountBean;
-	Logger _logger = Logger.getLogger(getClass());
+	Logger _logger = LoggerFactory.getLogger(getClass());
 	
 	public ModuleRunner(CountDownLatch start, CountDownLatch stop, Module module, @SuppressWarnings("rawtypes") NamedList input,  MonitorBean errorBean, MonitorBean timeoutCountBean) {
 		this.start = start;
@@ -60,7 +61,7 @@ public class ModuleRunner implements Runnable{
 			throw new RuntimeException(e);
 		} catch (Exception e) {
 			errorBean.inc(1); // a timeout might not be an error?
-			_logger.error(e);
+			_logger.error("Run Error",e);
 			e.printStackTrace();
 		} finally {
 			stop.countDown();

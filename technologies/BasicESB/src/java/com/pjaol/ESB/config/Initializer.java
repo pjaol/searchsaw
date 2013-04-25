@@ -29,7 +29,8 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.common.util.NamedList;
 
 import com.pjaol.ESB.core.Controller;
@@ -39,7 +40,7 @@ import com.pjaol.ESB.core.PipeLine;
 
 public class Initializer {
 
-	private Logger _logger = Logger.getLogger(getClass());
+	private Logger _logger = LoggerFactory.getLogger(getClass());
 	private ESBCore core = ESBCore.getInstance();
 	private Map<String, Controller> uris = new HashMap<String, Controller>();
 	

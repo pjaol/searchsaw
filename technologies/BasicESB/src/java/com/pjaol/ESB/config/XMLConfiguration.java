@@ -28,7 +28,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -50,7 +51,7 @@ public class XMLConfiguration {
 	
 	ESBCore core = ESBCore.getInstance();
 	
-	Logger _logger = Logger.getLogger(getClass());
+	Logger _logger = LoggerFactory.getLogger(getClass());
 
 	static {
 		
@@ -208,7 +209,7 @@ public class XMLConfiguration {
 				PipeLineComponent pl = new PipeLineComponent();
 				
 				getComponent(n,pl );
-				_logger.info(pl);
+				_logger.info(pl.toString());
 				
 				String name =pl.getName();
 				

@@ -27,8 +27,8 @@ import javax.management.MBeanRegistrationException;
 import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.common.util.NamedList;
 
 import com.pjaol.ESB.Exceptions.ModuleRunException;
@@ -48,7 +48,7 @@ public class Controller extends Module {
 	private int timeout;
 	private ESBCore core = ESBCore.getInstance();
 	private ExecutorService executorService;
-	private Logger _logger = Logger.getLogger(getClass());
+	private Logger _logger = LoggerFactory.getLogger(getClass());
 
 	// what to measure
 	private Monitor monit = Monitor.getInstance();
@@ -121,7 +121,7 @@ public class Controller extends Module {
 		//
 		// input.addAll(allOutput);
 
-		if (_logger.getLevel() == Level.DEBUG)
+		if (_logger.isDebugEnabled())
 			_logger.debug("******* Starting *******");
 
 		long startT = System.currentTimeMillis();
@@ -154,7 +154,7 @@ public class Controller extends Module {
 
 		long endT = System.currentTimeMillis();
 
-		if (_logger.getLevel() == Level.DEBUG)
+		if (_logger.isDebugEnabled())
 			_logger.debug("******* Shutting down ******* taken: "
 					+ (endT - startT) + " ms");
 
