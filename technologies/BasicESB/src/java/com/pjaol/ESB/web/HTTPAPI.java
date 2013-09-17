@@ -110,8 +110,8 @@ public class HTTPAPI extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-
-
+		resp.setCharacterEncoding("UTF-8");
+		
 		NamedList<String> input = new NamedList<String>();
 		String pathInfo = httpParamsParser.getPath(req);
 
@@ -138,9 +138,10 @@ public class HTTPAPI extends HttpServlet {
 		Writer writer = resp.getWriter();
 
 		if (format == null || format.equals("xml")) {
+			resp.setContentType("text/xml");
 			writer.write(xmlFormatter.toOutput(results));
 		} else if (format.equals("json")) {
-
+			resp.setContentType("application/json");
 			String jsonpCallback = req.getParameter("jsoncallback");
 			if (jsonpCallback != null) {
 				writer.write(jsonpCallback + "(");
