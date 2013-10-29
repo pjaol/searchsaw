@@ -12,7 +12,7 @@
             Core ESB for running high performance modules
     </description>
 
-	<property name="pub.revision" value="0.6"/>
+	<property name="pub.revision" value="0.7"/>
 	<property name="pub.status" value="integration"/>
 	<property name="pub.resolver" value="internal"/>
 	<property name="ivy.lib.dir" value="lib" />
