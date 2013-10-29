@@ -16,6 +16,7 @@
 package com.pjaol.ESB.web;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -129,6 +130,15 @@ public class HTTPAPI extends HttpServlet {
 		NamedList results = null;
 		try {
 			results = controller.process(input);
+		}catch(java.util.concurrent.RejectedExecutionException ree){
+			//resp.reset();
+			resp.setContentType("text/plain");
+			resp.setHeader("Retry-After", "1");
+			resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
+					req.getContextPath()+req.getServletPath()+" is currently unavailable.  Header value for 'Retry-After' sent with value '1'.");
+			
+			
+            return;
 		} catch (ModuleRunException e) {
 			throw new ServletException(e);
 		}
