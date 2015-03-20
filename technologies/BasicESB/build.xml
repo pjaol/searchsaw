@@ -72,7 +72,7 @@
           target: compile              
          ================================= -->
 	<target name="compile" description="compile java files">
-		<javac srcdir="${compile.path}" destdir="${build.dir}" classpathref="classpath" debug="on" />
+		<javac srcdir="${compile.path}" destdir="${build.dir}" classpathref="classpath" debug="on" encoding="UTF-8"/>
 		<jar destfile="${dist.dir}/${ant.project.name}.jar" basedir="${build.dir}"/>
 		
 		<war destfile="${dist.dir}/${ant.project.name}.war"  

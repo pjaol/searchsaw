@@ -18,6 +18,8 @@ package com.pjaol.ESB.web;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -48,9 +50,8 @@ public class HTTPAPI extends HttpServlet {
 
 	String fileName = "/conf/esbconfig.xml";
 
-	Formatter jsonFormatter = new JSONFormatter();
-	Formatter xmlFormatter = new XMLFormatter();
-
+	Map<String, Formatter> formatters = new HashMap<String, Formatter>();
+	
 	HTTPParamsParser httpParamsParser;
 
 	int threadPoolSize = 10; //can be configured from globals
@@ -104,6 +105,26 @@ public class HTTPAPI extends HttpServlet {
 			maxThreads = maxThreads.trim();
 			threadPoolSize = new Integer(maxThreads);
 		}
+	
+		Formatter jsonFormatter = new JSONFormatter();
+		Formatter xmlFormatter = new XMLFormatter();
+
+		formatters.put("json", jsonFormatter);
+		formatters.put("xml", xmlFormatter);
+		String formater = core.getGlobals().get("Formatters");
+		String[] formaterClasses = formater.split(",");
+		for(String fc: formaterClasses){
+			String[] kv = fc.split(":");
+			Formatter f;
+			try {
+				f = (Formatter)Class.forName(kv[1]).newInstance();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			
+			formatters.put(kv[0], f);
+		}
+		
 		
 		super.init(config);
 	}
@@ -149,7 +170,7 @@ public class HTTPAPI extends HttpServlet {
 
 		if (format == null || format.equals("xml")) {
 			resp.setContentType("text/xml");
-			writer.write(xmlFormatter.toOutput(results));
+			writer.write(formatters.get("xml").toOutput(results));
 		} else if (format.equals("json")) {
 			resp.setContentType("application/json");
 			String jsonpCallback = req.getParameter("jsoncallback");
@@ -157,11 +178,14 @@ public class HTTPAPI extends HttpServlet {
 				writer.write(jsonpCallback + "(");
 			}
 
-			writer.write(jsonFormatter.toOutput(results));
+			writer.write(formatters.get("json").toOutput(results));
 
 			if (jsonpCallback != null) {
 				writer.write(");");
 			}
+		} else {
+			Formatter formatter = formatters.get(format);
+			writer.write(formatter.toOutput(results));
 		}
 
 		writer.flush();
