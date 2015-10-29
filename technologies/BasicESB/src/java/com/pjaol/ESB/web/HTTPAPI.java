@@ -112,19 +112,20 @@ public class HTTPAPI extends HttpServlet {
 		formatters.put("json", jsonFormatter);
 		formatters.put("xml", xmlFormatter);
 		String formater = core.getGlobals().get("Formatters");
-		String[] formaterClasses = formater.split(",");
-		for(String fc: formaterClasses){
-			String[] kv = fc.split(":");
-			Formatter f;
-			try {
-				f = (Formatter)Class.forName(kv[1]).newInstance();
-			} catch (Exception e) {
-				throw new RuntimeException(e);
+		if (formater != null){
+			String[] formaterClasses = formater.split(",");
+			for(String fc: formaterClasses){
+				String[] kv = fc.split(":");
+				Formatter f;
+				try {
+					f = (Formatter)Class.forName(kv[1]).newInstance();
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+				
+				formatters.put(kv[0], f);
 			}
-			
-			formatters.put(kv[0], f);
 		}
-		
 		
 		super.init(config);
 	}
